@@ -26,6 +26,15 @@ public static class FileUtils
     {
         try
         {
+            // Obtener la ruta de la carpeta (sin el nombre del archivo)
+            string? directory = Path.GetDirectoryName(path);
+
+            // Si la carpeta no existe, la creamos
+            if (directory != null && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             File.WriteAllLines(path, lines);
         }
         catch (Exception)

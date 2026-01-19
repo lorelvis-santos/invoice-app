@@ -1,4 +1,4 @@
-namespace App.Views;
+namespace App.View;
 
 public static class HomeMenu
 {

@@ -1,6 +1,6 @@
 using App.Extensions;
 
-namespace App.Views;
+namespace App.View;
 
 public static class Menu
 {

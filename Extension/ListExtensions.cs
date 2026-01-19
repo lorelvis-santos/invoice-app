@@ -21,7 +21,7 @@ public static class ListExtensions
 
     public static List<T> TakeFirstN<T>(this List<T> data, int start, int limit = -1)
     {
-        if (data == null || data.Count == 0 || start >= data.Count || limit < 1)
+        if (data == null || data.Count == 0 || start >= data.Count || (limit < 1 && limit != -1))
             return [];
 
         List<T> items = [];

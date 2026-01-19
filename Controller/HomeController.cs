@@ -1,6 +1,6 @@
-using App.Views;
+using App.View;
 
-namespace App.Controllers;
+namespace App.Controller;
 
 public static class HomeController
 {
@@ -9,7 +9,7 @@ public static class HomeController
         return HandleChoice(HomeMenu.Show());
     }
 
-    public static bool HandleChoice(int choice)
+    private static bool HandleChoice(int choice)
     {
         switch (choice)
         {

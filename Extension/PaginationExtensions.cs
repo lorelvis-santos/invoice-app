@@ -36,7 +36,7 @@ public static class PaginationExtensions
     public static int NextPage(this int totalPages, int currentPage)
     {
         if (totalPages <= 0) return 1;
-        return currentPage >= totalPages ? 1 : ++currentPage;
+        return currentPage >= totalPages ? 1 : currentPage + 1;
     }
 
     // Extensión para enteros: permite calcular la página anterior desde el total
@@ -44,6 +44,6 @@ public static class PaginationExtensions
     public static int PreviousPage(this int totalPages, int currentPage)
     {
         if (totalPages <= 0) return 1;
-        return currentPage - 1 <= 0 ? totalPages : --currentPage;
+        return currentPage - 1 <= 0 ? totalPages : currentPage - 1;
     }
 }
