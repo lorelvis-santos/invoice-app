@@ -94,6 +94,11 @@ public static class Database
         return -1;
     }
 
+    public static int FindRowIndex(string path, string header, string value)
+    {
+        return FindRowIndex(Load(path), header, value);
+    }
+
     public static List<string> Where(List<string> lines, string header, string value)
     {
         if (lines.Count < 2)
@@ -119,6 +124,11 @@ public static class Database
         }
 
         return rows;
+    }
+
+    public static List<string> Where(string path, string header, string value)
+    {
+        return Where(Load(path), header, value);
     }
 
     public static List<string> AddRow(List<string> lines, string row)
