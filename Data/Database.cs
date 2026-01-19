@@ -1,11 +1,14 @@
-namespace App.Utils;
+using App.Core;
+using App.Extensions;
 
-public static class DatabaseUtils
+namespace App.Data;
+
+public static class Database
 {
-    public static List<string> LoadCsv(string path, int limitOfRows = -1)
+    public static List<string> Load(string path, int limitOfRows = -1)
     {
         if (limitOfRows > 0)
-            return ListUtils.TakeFirstN(FileUtils.ReadFile(path, false), limitOfRows);
+            return FileUtils.ReadFile(path, false).TakeFirstN(limitOfRows);
 
         return FileUtils.ReadFile(path, false);
     }
@@ -18,7 +21,7 @@ public static class DatabaseUtils
         return lines;
     }
 
-    public static bool SaveCsv(string path, List<string> lines)
+    public static bool Save(string path, List<string> lines)
     {
         return FileUtils.WriteToFile(path, lines);
     }
@@ -43,7 +46,7 @@ public static class DatabaseUtils
 
         if (lines.Count == 0 || !string.Equals(lines[0], string.Join(",", expectedHeaders), StringComparison.OrdinalIgnoreCase))
         {
-            List<string> data = LoadCsv(path);
+            List<string> data = Load(path);
             data.Insert(0, string.Join(",", expectedHeaders));
             FileUtils.WriteToFile(path, data);
             return false;
@@ -57,7 +60,7 @@ public static class DatabaseUtils
         if (lines.Count < 2)
             return -1;
 
-        // Obtenemos los headers del .csv recibido
+        // Obtenemos los headers del archivo (.txt o .csv) recibido
         List<string> headers = [.. lines[0].Split(',')];
 
         // Obtenemos el índice de la columna que nos interesa
@@ -82,7 +85,7 @@ public static class DatabaseUtils
         if (lines.Count < 2)
             return [];
 
-        // Obtenemos los headers del .csv recibido
+        // Obtenemos los headers del archivo (.txt o .csv) recibido
         List<string> headers = [.. lines[0].Split(',')];
 
         // Obtenemos el índice de la columna que nos interesa
@@ -137,6 +140,6 @@ public static class DatabaseUtils
             lines.RemoveAt(0); // Quitamos los headers para paginar solo datos
         }
 
-        return PaginationUtils.GetPagination(lines, page, rowsPerPage);
+        return lines.GetPagination(page, rowsPerPage);
     }
 }

@@ -1,5 +1,3 @@
-using App.Views;
-
 namespace App.Views;
 
 public static class HomeMenu
@@ -7,10 +5,10 @@ public static class HomeMenu
     public static int Show()
     {
         return Menu.Show(
-            "Bienvenido a tu gestor de facturas",
+            "Bienvenido a tu Gestor de Facturas",
             [
-                "Opción 1",
-                "Opción 2"
+                "Ver facturas",
+                "Ver productos"
             ]
         );
     }

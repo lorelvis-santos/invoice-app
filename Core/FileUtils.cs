@@ -1,4 +1,4 @@
-namespace App.Utils;
+namespace App.Core;
 
 public static class FileUtils
 {

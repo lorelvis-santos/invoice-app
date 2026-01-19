@@ -1,4 +1,4 @@
-using App.Utils;
+using App.Extensions;
 
 namespace App.Views;
 
@@ -79,7 +79,7 @@ public static class Menu
 
                 case ConsoleKey.D:
                 case ConsoleKey.RightArrow:
-                    page = PaginationUtils.NextPage(pages.Length, page);
+                    page = pages.Length.NextPage(page);
                     return Show(title, pages, page, rowsPerPage, true, subtitle, tips);
 
                 case ConsoleKey.DownArrow:
@@ -89,7 +89,7 @@ public static class Menu
 
                 case ConsoleKey.LeftArrow:
                 case ConsoleKey.A:
-                    page = PaginationUtils.PreviousPage(pages.Length, page);
+                    page = pages.Length.PreviousPage(page);
                     return Show(title, pages, page, rowsPerPage, true, subtitle, tips);
 
                 case ConsoleKey.Enter:
