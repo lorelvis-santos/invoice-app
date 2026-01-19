@@ -1,4 +1,4 @@
-namespace App.Extensions;
+namespace App.Extension;
 
 // Migrado desde PaginationUtils, aprovechando el concepto de extender clases nativas
 public static class PaginationExtensions
@@ -29,6 +29,27 @@ public static class PaginationExtensions
         if (items.Count % rowsPerPage != 0) totalPages++;
         
         return totalPages;
+    }
+
+    public static string[][] ToPages(this List<string> items, int rowsPerPage)
+    {
+        // Calculamos cuántas páginas habrá en total
+        int totalPages = items.GetTotalPages(rowsPerPage);
+        
+        // 2. Creamos la matriz (array de arrays) con el tamaño exacto
+        string[][] matrix = new string[totalPages][];
+
+        // 3. Llenamos cada posición de la matriz con los datos de esa página
+        for (int i = 1; i <= totalPages; i++)
+        {
+            // Usamos GetPagination para obtener la lista de esa página específica
+            List<string> pageData = items.GetPagination(i, rowsPerPage);
+            
+            // Convertimos la lista de la página a un array nativo para la matriz
+            matrix[i - 1] = pageData.ToArray();
+        }
+
+        return matrix;
     }
 
     // Extensión para enteros: permite calcular la siguiente página desde el total

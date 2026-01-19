@@ -1,4 +1,4 @@
-namespace App.Extensions;
+namespace App.Extension;
 
 public static class ListExtensions
 {

@@ -1,5 +1,5 @@
 using App.Core;
-using App.Extensions;
+using App.Extension;
 
 namespace App.Data;
 
@@ -24,6 +24,11 @@ public static class Database
     public static bool Save(string path, List<string> lines)
     {
         return FileUtils.WriteToFile(path, lines);
+    }
+
+    public static bool Append(string path, string line)
+    {
+        return FileUtils.AppendToFile(path, line);
     }
 
     public static bool Clear(string path, string headers)
