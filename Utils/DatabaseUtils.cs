@@ -12,7 +12,8 @@ public static class DatabaseUtils
 
     public static List<string> Reverse(string path, string headers)
     {
-        List<string> lines = [.. FileUtils.ReadFile(path, true).ToArray().Reverse()];
+        List<string> lines = FileUtils.ReadFile(path, true);
+        lines.Reverse();
         lines.Insert(0, headers);
         return lines;
     }
@@ -121,7 +122,7 @@ public static class DatabaseUtils
     public static List<string> UpdateRow(List<string> lines, int index, string newRow)
     {
         // Recordar que el índice 0 es para los headers
-        if (index <= 0 || index > lines.Count)
+        if (index <= 0 || index >= lines.Count)
             return lines;
 
         lines[index] = newRow;
