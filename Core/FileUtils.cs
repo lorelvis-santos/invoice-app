@@ -45,6 +45,29 @@ public static class FileUtils
         return true;
     }
 
+    public static bool AppendToFile(string path, string line)
+    {
+        try
+        {
+            // Obtener la ruta de la carpeta (sin el nombre del archivo)
+            string? directory = Path.GetDirectoryName(path);
+
+            // Si la carpeta no existe, la creamos
+            if (directory != null && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.AppendAllLines(path, [line]);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public static bool Exists(string path)
     {
         return File.Exists(path);
