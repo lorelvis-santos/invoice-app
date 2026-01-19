@@ -1,11 +1,13 @@
+using App.View.Common;
+
 namespace App.View;
 
-public static class HomeMenu
+public class HomeMenu : IView
 {
-    public static int Show()
+    public int Show()
     {
         return Menu.Show(
-            "Bienvenido a tu Gestor de Facturas",
+            "Gestor de Facturas",
             [
                 "Ver facturas",
                 "Ver productos"

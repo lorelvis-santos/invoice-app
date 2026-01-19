@@ -2,14 +2,11 @@ using App.View;
 
 namespace App.Controller;
 
-public static class HomeController
+public class HomeController : BaseController
 {
-    public static bool Execute()
-    {
-        return HandleChoice(HomeMenu.Show());
-    }
+    public HomeController(HomeMenu homeMenu) : base(homeMenu) { }
 
-    private static bool HandleChoice(int choice)
+    protected override bool HandleChoice(int choice)
     {
         switch (choice)
         {
@@ -37,8 +34,14 @@ public static class HomeController
                 break;
                 
             case 1:
-                Console.WriteLine("Viendo productos...");
-                Console.ReadKey();
+                ProductsController productsController = new(new ProductsMenu(), new Repository.ProductsRepository());
+                bool productsLoop = true;
+
+                while (productsLoop)
+                {
+                    productsLoop = productsController.Execute();
+                }
+
                 break;
 
             default:

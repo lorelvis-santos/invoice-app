@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace App.Repository;
 
-public class ProductRepository: BaseRepository<Product>
+public class ProductsRepository: BaseRepository<Product>
 {    
-    public ProductRepository() : base(Product.FullPath, Product.Headers) { }
+    public ProductsRepository() : base(Product.FullPath, Product.Headers) { }
 
     protected override string MapToText(Product item)
     {

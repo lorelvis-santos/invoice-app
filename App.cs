@@ -1,8 +1,9 @@
 ﻿using App.Controller;
 using App.Model;
 using App.Repository;
+using App.View;
 
-ProductRepository repository = new();
+ProductsRepository repository = new();
 
 List<Product> products = new List<Product>
 {
@@ -23,9 +24,11 @@ Console.WriteLine(Product.FullPath);
 
 Console.ReadKey();
 
+HomeController homeController = new(new HomeMenu());
+
 bool homeLoop = true;
 
 while (homeLoop)
 {
-    homeLoop = HomeController.Execute();
+    homeLoop = homeController.Execute();
 }
