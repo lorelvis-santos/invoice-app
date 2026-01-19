@@ -1,10 +1,10 @@
-using App.Extensions;
+using App.Extension;
 
-namespace App.View;
+namespace App.View.Common;
 
 public static class Menu
 {
-    private static bool showHelp = false;
+    private static bool showHelp = true;
 
     public static int Show(string title, string[] choices, string subtitle = "", bool error = false, string[]? tips = null)
     {
