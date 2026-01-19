@@ -1,4 +1,6 @@
 using App.View;
+using App.Repository;
+using App.Service;
 
 namespace App.Controller;
 
@@ -34,12 +36,21 @@ public class HomeController : BaseController
                 break;
                 
             case 1:
-                ProductsController productsController = new(new ProductsMenu(), new Repository.ProductsRepository());
+                var productMenu = new ProductMenu();
+                var productRepo = new ProductRepository();
+                var productService = new ProductService(productRepo);
+
+                ProductController ProductController = new(
+                    productMenu, 
+                    productRepo,
+                    productService
+                );
+
                 bool productsLoop = true;
 
                 while (productsLoop)
                 {
-                    productsLoop = productsController.Execute();
+                    productsLoop = ProductController.Execute();
                 }
 
                 break;

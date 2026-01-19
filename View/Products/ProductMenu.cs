@@ -2,7 +2,7 @@ using App.View.Common;
 
 namespace App.View;
 
-public class ProductsMenu : IView
+public class ProductMenu : IView
 {
     // Propiedades para guardar la configuración antes de llamar a Show()
     public string[][] Pages { get; set; } = [];
@@ -17,7 +17,7 @@ public class ProductsMenu : IView
             Pages,
             1,
             RowsPerPage,
-            false,
+            true,
             Subtitle,
             Tips
         );

@@ -1,11 +1,12 @@
+using App.Data;
 using App.Model;
 using System.Globalization;
 
 namespace App.Repository;
 
-public class ProductsRepository: BaseRepository<Product>
+public class ProductRepository: BaseRepository<Product>
 {    
-    public ProductsRepository() : base(Product.FullPath, Product.Headers) { }
+    public ProductRepository() : base(Product.FullPath, Product.Headers) { }
 
     protected override string MapToText(Product item)
     {
@@ -24,5 +25,20 @@ public class ProductsRepository: BaseRepository<Product>
             Price = decimal.Parse(parts[3], CultureInfo.InvariantCulture),
             Stock = int.Parse(parts[4])
         };
+    }
+
+    public bool Exists(string name)
+    {
+        var products = GetAll();
+
+        foreach (var product in products)
+        {
+            if (string.Equals(product.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
