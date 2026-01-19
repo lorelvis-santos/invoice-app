@@ -19,10 +19,20 @@ public abstract class BaseRepository<T>
         return Database.EnsureHeaders(Path, Headers);
     }
 
+    public bool Create(T item)
+    {
+        EnsureHeaders();
+
+        string row = MapToText(item);
+
+        return Database.Append(Path, row);
+    }
+
     // Obtiene todos los objetos del archivo, ignorando los headers.
     public List<T> GetAll()
     {
         EnsureHeaders();
+
         List<string> lines = FileUtils.ReadFile(Path, true);
         List<T> items = [];
 
@@ -38,6 +48,7 @@ public abstract class BaseRepository<T>
     public bool SaveAll(List<T> items)
     {
         EnsureHeaders();
+
         List<string> lines = [Headers];
 
         foreach (T item in items)
