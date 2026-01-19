@@ -1,5 +1,3 @@
-using App.Data;
-
 namespace App.Model;
 
 public class Product : BaseModel
