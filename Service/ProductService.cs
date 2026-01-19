@@ -35,6 +35,7 @@ public class ProductService
             return (false, "El producto ya existe en el sistema.");
         }
 
+        // Si todo esta bien, se crea el producto
         Product newProduct = new Product
         {
             Name = name,

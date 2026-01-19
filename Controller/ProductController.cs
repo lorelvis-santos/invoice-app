@@ -47,6 +47,8 @@ public class ProductController : BaseController
             return true;
         }
 
+        // A partir de aqui se implementarían funcionalidades como poder editar y eliminar...
+
         return true;
     }
 
