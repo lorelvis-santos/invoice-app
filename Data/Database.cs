@@ -44,11 +44,20 @@ public static class Database
             lines = FileUtils.ReadFile(path, false);
         }
 
-        if (lines.Count == 0 || !string.Equals(lines[0], string.Join(",", expectedHeaders), StringComparison.OrdinalIgnoreCase))
+        string joinedHeaders = string.Join(",", expectedHeaders);
+
+        // Si no hay nada, agregamos los headers solamente
+        if (lines.Count == 0)
         {
-            List<string> data = Load(path);
-            data.Insert(0, string.Join(",", expectedHeaders));
-            FileUtils.WriteToFile(path, data);
+            FileUtils.WriteToFile(path, [joinedHeaders]);
+            return false;
+        }
+
+        // Si los headers del archivo difieren con los actuales, se reemplazan
+        if (!string.Equals(lines[0], string.Join(",", expectedHeaders), StringComparison.OrdinalIgnoreCase))
+        {
+            lines[0] = joinedHeaders;
+            FileUtils.WriteToFile(path, lines);
             return false;
         }
 
