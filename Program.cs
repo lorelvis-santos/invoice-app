@@ -1,5 +1,8 @@
-﻿using App.Views;
+﻿using App.Controllers;
 
-int choice = HomeMenu.Show();
+bool homeLoop = true;
 
-Console.WriteLine(choice);
+while (homeLoop)
+{
+    homeLoop = HomeController.Execute();
+}
