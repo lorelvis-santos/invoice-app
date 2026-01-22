@@ -3,7 +3,7 @@ using App.View.Common;
 
 namespace App.View;
 
-public class InvoiceDetailsMenu : IView
+public class InvoiceItemsMenu : IView
 {
     // Propiedades para guardar la configuración antes de llamar a Show()
     public Invoice Invoice { get; set; } = new();

@@ -12,6 +12,16 @@ public class ProductService
         _repo = repo;
     }
 
+    public Product? GetById(string id)
+    {
+        if (!Guid.TryParse(id, out _))
+        {
+            return null;
+        }
+
+        return _repo.GetById(id);
+    }
+
     public (bool Success, string Message) UpdateStock(string id, int newStock)
     {
         if (!Guid.TryParse(id, out _))

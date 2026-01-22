@@ -10,31 +10,34 @@ public class InvoiceController : BaseController
 {
     private readonly InvoiceMenu _view;
     private readonly CreateInvoiceMenu _createInvoiceView;
-    private readonly InvoiceDetailsMenu _invoiceDetailsView;
+    private readonly InvoiceItemsMenu _invoiceItemsView;
+    private readonly InvoiceDraftItemsMenu _invoiceDraftItemsView;
+    private readonly InvoiceDraftItemOptionsMenu _invoiceDraftItemOptionsView;
+    private readonly ProductController _productController;
     private readonly InvoiceRepository _repo;
     private readonly InvoiceService _service;
-    private readonly ProductController _productController;
-    private readonly ProductService _productService;
-
+    
     private List<Invoice> _invoices = [];
 
     public InvoiceController(
         InvoiceMenu view, 
         CreateInvoiceMenu createInvoiceView,
-        InvoiceDetailsMenu invoiceDetailsView,
-        InvoiceRepository repo,
-        InvoiceService service,
+        InvoiceItemsMenu invoiceItemsView,
+        InvoiceDraftItemsMenu invoiceDraftItemsView,
+        InvoiceDraftItemOptionsMenu invoiceDraftItemOptionsView,
         ProductController productController,
-        ProductService productService
+        InvoiceRepository repo,
+        InvoiceService service
     ) : base(view)
     {
         _view = view;
         _createInvoiceView = createInvoiceView;
-        _invoiceDetailsView = invoiceDetailsView;
+        _invoiceItemsView = invoiceItemsView;
+        _invoiceDraftItemsView = invoiceDraftItemsView;
+        _invoiceDraftItemOptionsView = invoiceDraftItemOptionsView;
+        _productController = productController;
         _repo = repo;
         _service = service;
-        _productController = productController;
-        _productService = productService;
     }
 
     public new bool Execute()
@@ -53,12 +56,13 @@ public class InvoiceController : BaseController
 
     protected override bool HandleChoice(int choice)
     {
+        // Caso volver
         if (choice == -1)
         {
             return false;
         }
 
-        // Caso especial: Insercion
+        // Caso especial: Insercion / Nueva Factura
         if (choice == -100)
         {
             CreateInvoice();
@@ -66,188 +70,196 @@ public class InvoiceController : BaseController
         }
 
         // Visualizar detalles de factura
-        Invoice selectedInvoice = _invoices[choice];
-        List<InvoiceDetail>? invoiceDetails = _service.GetInvoiceDetails(selectedInvoice.Id);
+        return ShowInvoiceDetails(choice);
+    }
 
-        if (invoiceDetails == null)
+    private bool ShowInvoiceDetails(int choice)
+    {
+        Invoice selectedInvoice = _invoices[choice];
+        List<InvoiceItem>? invoiceItems = _service.GetInvoiceItems(selectedInvoice.Id);
+
+        if (invoiceItems == null)
         {
             return false;
         }
 
-        List<string> data = [.. invoiceDetails.Select(d => $"Nombre: {d.ProductName} | Unidad: {d.UnitPrice} | Cantidad: {d.Quantity} | Total: ${d.RowTotal}" ?? "N/A")];
+        List<string> data = [.. invoiceItems.Select(d => $"Nombre: {d.ProductName} x{d.Quantity} | Unidad: {d.UnitPrice} | Total: ${d.RowTotal}" ?? "N/A")];
 
         int rowsPerPage = 10;
-        _invoiceDetailsView.Invoice = selectedInvoice;
-        _invoiceDetailsView.Pages = data.ToPages(rowsPerPage);
-        _invoiceDetailsView.RowsPerPage = rowsPerPage;
-        _invoiceDetailsView.Show();
+        _invoiceItemsView.Invoice = selectedInvoice;
+        _invoiceItemsView.Pages = data.ToPages(rowsPerPage);
+        _invoiceItemsView.RowsPerPage = rowsPerPage;
+        _invoiceItemsView.Show();
 
         return true;
     }
 
     private bool CreateInvoice()
     {
-        List<InvoiceDetail> draftDetails = [];
-        bool isCreating = true;
+        // Declaramos las variables que nos ayudaran a crear la factura
+        List<InvoiceItem> draftItems = [];
+        bool isCreatingLoop = true;
 
-        while (isCreating)
+        decimal currentSubtotal = 0, currentTaxes = 0;
+        List<string> data = [];
+        int rowsPerPage = 10;
+
+        while (isCreatingLoop)
         {
-            int choice = _createInvoiceView.Show();
+            currentSubtotal = draftItems.Sum(d => d.RowTotal);
+            currentTaxes = TaxesService.CalculateTaxes(currentSubtotal);
 
-            switch (choice)
+            // Mostramos el detalle de la factura actual
+            data = [.. draftItems.Select(d => $"Nombre: {d.ProductName} x{d.Quantity} | Unidad: {d.UnitPrice} | Total: ${d.RowTotal}" ?? "N/A")];
+
+            _invoiceDraftItemsView.RowsPerPage = rowsPerPage;
+            _invoiceDraftItemsView.Pages = data.ToPages(rowsPerPage);
+            _invoiceDraftItemsView.CurrentSubtotal = currentSubtotal;
+            _invoiceDraftItemsView.CurrentTaxes = currentTaxes;
+            
+            // Manejamos lo seleccionado por el usuario
+            int choice = _invoiceDraftItemsView.Show();
+
+            // Caso volver
+            if (choice == -1)
             {
-                case -1:
-                    isCreating = false;
-
-                    foreach (var detail in draftDetails)
-                    {
-                        _productService.IncrementStock(detail.ProductId, detail.Quantity);
-                    }
-
-                    break;
-                case 0:
-                    // Ver detalle..
-                    ShowDraftDetail(draftDetails);
-                    break;
-                case 1:
-                    // Gestionar productos..
-                    AddOrModifyProductToDraft(draftDetails);
-                    break;
-                case 2:
-                    // Eliminar productos..
-                    RemoveProductFromDraft(draftDetails);
-                    break;
-                case 3:
-                    // Emitir factura..
-                    if (draftDetails.Count == 0) {
-                        Console.WriteLine("\n\tNo puedes emitir una factura vacía.");
-                    } else {
-                        var result = _service.EmitInvoice(draftDetails);
-                        Console.WriteLine($"\n\t{result.Message}");
-                        if (result.Success)
-                        {
-                            isCreating = false; 
-                        }
-                    }
-                    Console.ReadKey();
-                    break;
+                isCreatingLoop = false;
+                _service.DeleteDraft(draftItems);
+                continue;
             }
+
+            // Caso especial: Inserción
+            if (choice == -100)
+            {
+                InsertDraftItem(draftItems);                
+                continue;
+            }
+
+            // Caso especial: Emitir factura
+            if (choice == -101) {
+                isCreatingLoop = EmitInvoice(draftItems);
+            }
+
+            if (choice < 0 || choice >= draftItems.Count)
+            {
+                // Opcion invalida
+                continue;
+            }
+
+            // El usuario seleccionó un item, le mostramos las opciones
+            InvoiceItem selectedDraftItem = draftItems[choice];
+            AlterDraftItem(selectedDraftItem, draftItems);
         }
     
         return false;
     }
 
-    private void ShowDraftDetail(List<InvoiceDetail> draftDetails)
-    {
-        Console.Clear();
-        Console.WriteLine("\n\t--- Vista Previa de la Factura ---");
-        Console.WriteLine();
-
-        decimal currentSubtotal = 0;
-
-        foreach (var item in draftDetails)
-        {
-            Console.WriteLine($"\t{item.ProductName} x{item.Quantity} | Unidad: ${item.UnitPrice} | Total: ${item.RowTotal}");
-            currentSubtotal += item.RowTotal;
-        }
-
-        Console.WriteLine("\n\t----------------------------------");
-        Console.WriteLine($"\tSUBTOTAL: ${currentSubtotal}");
-        Console.WriteLine($"\tIMPUESTOS ({_service.TaxRate * 100}%): ${Math.Round(currentSubtotal * _service.TaxRate, 2)}");
-        Console.WriteLine($"\tTOTAL ESTIMADO: ${Math.Round(currentSubtotal * (1 + _service.TaxRate), 2)}");
-        Console.Write("\n\tPresiona cualquier tecla para volver...");
-        Console.ReadKey();
-    }
-
-    private bool AddOrModifyProductToDraft(List<InvoiceDetail> draftDetails)
+    private bool InsertDraftItem(List<InvoiceItem> draftItems)
     {
         Product? product = _productController.Select();
-        bool isModifying = false;
-        int productIndex = -1;
 
         if (product == null)
         {
             return false;
         }
 
-        if ((productIndex = draftDetails.FindIndex(p => p.ProductId == product.Id)) != -1)
+        if (product.Stock == 0)
         {
-            Console.WriteLine("\n\tEse producto ya se encuentra agregado al borrador.");
-            Console.Write("\n\tA continuación ingresa la nueva cantidad.");
-            isModifying = true;
+            Console.WriteLine("\n\tNo hay unidades disponibles de ese producto.");
+            Console.ReadKey();
+            return false;
         }
 
         Console.Clear();
         Console.WriteLine();
         Console.WriteLine("\tPanel de administración");
         Console.WriteLine();
-        Console.WriteLine($"\t{(isModifying ? "Modificando un producto de" : "Agregando un producto a")} la factura actual");
+        Console.WriteLine($"\tAgregando un producto a la factura actual");
 
         string quantityInput;
-        string promptInput = isModifying ?
-            $"Ingresa la nueva cantidad de {product.Name}" :
-            $"¿Cuántas unidades de {product.Name} desea agregar?";
         int quantity;
 
         do
         {
-            quantityInput = PromptInput(promptInput);
+            quantityInput = PromptInput($"¿Cuántas unidades de {product.Name} desea agregar?");
         } while (!int.TryParse(quantityInput, out quantity) || quantity <= 0 || quantity > product.Stock);
 
-        if (isModifying)
-        {
-            int oldQuantity = draftDetails[productIndex].Quantity;
-            draftDetails[productIndex].Quantity = quantity;
-            _productService.UpdateStock(product.Id, product.Stock + (oldQuantity - quantity));
-        } else
-        {
-            draftDetails.Add(new InvoiceDetail
-            {
-                ProductId = product.Id,
-                ProductName = product.Name ?? "N/A",
-                Quantity = quantity,
-                UnitPrice = product.Price
-            });
+        var (Success, Message) = _service.AddItemToDraft(product.Id, quantity, draftItems);
 
-            _productService.UpdateStock(product.Id, product.Stock - quantity);
-        }
-        
-        Console.WriteLine(isModifying ? "\n\tSe actualizó la nueva cantidad del producto." : "\n\tProducto agregado al borrador.");
-        Console.Write("\n\tPresiona una tecla para continuar...");
+        Console.WriteLine($"\n\t{Message}");
         Console.ReadKey();
+
+        return Success;
+    }
+
+    private bool AlterDraftItem(InvoiceItem draftItem, List<InvoiceItem> draftItems)
+    {
+        _invoiceDraftItemOptionsView.DraftItem = draftItem;
+        int choice = _invoiceDraftItemOptionsView.Show();
+
+        switch (choice)
+        {
+            case 0: // edit
+                ModifyDraftItem(draftItem, draftItems);
+                break;
+            case 1: // delete
+                RemoveDraftItem(draftItem, draftItems);
+                break;
+            default:
+                return false;
+        }
 
         return true;
     }
 
-    private bool RemoveProductFromDraft(List<InvoiceDetail> draftDetails)
+    private bool ModifyDraftItem(InvoiceItem draftItem, List<InvoiceItem> draftItems)
     {
-        List<Product> draftProducts = [.. draftDetails.Select(d => new Product{
-            Id = d.ProductId,
-            Name = d.ProductName
-        })];
+        Console.Clear();
+        Console.WriteLine();
+        Console.WriteLine("\tPanel de administración");
+        Console.WriteLine();
+        Console.WriteLine($"\tModificando el producto {draftItem.ProductName}");
 
-        if (draftProducts.Count == 0)
+        string quantityInput;
+        int quantity;
+
+        do
         {
-            Console.Clear();
-            Console.WriteLine();
-            Console.WriteLine("\tPanel de administración");
-            Console.WriteLine();
-            Console.WriteLine($"\tEliminar producto de la factura");
-            Console.WriteLine("\n\tNo hay productos en la factura. Prueba agregando uno.");
-            Console.Write("\n\tPresiona una tecla para volver...");
+            quantityInput = PromptInput($"Ingresa la nueva cantidad de unidades de {draftItem.ProductName}");
+        } while (!int.TryParse(quantityInput, out quantity) || quantity <= 0);
+
+        var (Success, Message) = _service.ModifyItemFromDraft(draftItem.ProductId, draftItem.Quantity, quantity, draftItems);
+
+        Console.WriteLine($"\n\t{Message}");
+        Console.ReadKey();
+
+        return Success;
+    }
+
+    private bool RemoveDraftItem(InvoiceItem draftItem, List<InvoiceItem> draftItems)
+    {
+        var (Success, Message) = _service.RemoveItemFromDraft(draftItem, draftItems);
+        Console.WriteLine($"\n\t{Message}");
+        Console.ReadKey();
+        return Success;
+    }
+
+    private bool EmitInvoice(List<InvoiceItem> draftItems)
+    {
+        if (draftItems.Count == 0) {
+            Console.WriteLine("\n\tNo puedes emitir una factura vacía.");
             Console.ReadKey();
+        } else {
+            var (Success, Message) = _service.EmitInvoice(draftItems);
+
+            Console.WriteLine($"\n\t{Message}");
+            Console.ReadKey();
+            
+            if (Success)
+            {
+                return false; 
+            }
         }
-
-        Product? product = _productController.Select(draftProducts, false, false);
-        InvoiceDetail? detail = draftDetails.Find(p => p.ProductId == product?.Id);
-
-        if (product == null || detail == null)
-        {
-            return false;
-        }
-
-        _productService.IncrementStock(product.Id, detail.Quantity);
-        draftDetails.Remove(detail);
 
         return true;
     }
