@@ -97,13 +97,9 @@ public class InvoiceService
 
         var result = _productService.UpdateStock(product.Id, product.Stock - quantity);
 
-        if (result.Success)
-        {
-            return (true, "Producto agregado correctamente.");
-        } else
-        {
-            return (false, result.Message);
-        }
+        return result.Success
+            ? (true, "Producto agregado correctamente.")
+            : (false, result.Message);
     }
 
     public (bool Success, string Message) ModifyItemFromDraft(
@@ -122,7 +118,7 @@ public class InvoiceService
         int productIndex = draftItems.FindIndex(d => d.ProductId == product.Id);
         if (productIndex == -1)
         {
-            return (false, "El producto no se encuentra en la lista");
+            return (false, "El producto no se encuentra en la lista.");
         }
 
         if (quantity <= 0 || quantity > (product.Stock + oldQuantity))
@@ -147,7 +143,7 @@ public class InvoiceService
         _productService.IncrementStock(draftItem.ProductId, draftItem.Quantity);
         draftItems.Remove(draftItem);
 
-        return (true, "Producto eliminado correctamente");
+        return (true, "Producto eliminado correctamente.");
     }
 
     public (bool Success, string Message) DeleteDraft(List<InvoiceItem> draftItems)

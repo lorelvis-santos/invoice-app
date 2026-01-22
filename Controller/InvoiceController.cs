@@ -101,7 +101,7 @@ public class InvoiceController : BaseController
         bool isCreatingLoop = true;
 
         decimal currentSubtotal = 0, currentTaxes = 0;
-        List<string> data = [];
+        List<string> data;
         int rowsPerPage = 10;
 
         while (isCreatingLoop)
