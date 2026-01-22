@@ -63,7 +63,8 @@ public static class Menu
                 tips,
                 offset,
                 page,
-                pages.Length
+                pages.Length,
+                rowsPerPage
             );
 
             // Con esta parte manejamos las teclas que presione el usuario
@@ -121,8 +122,12 @@ public static class Menu
                 case ConsoleKey.I: // Insertar
                     if (!specialKeys)
                         break;
-
                     return -100;
+
+                case ConsoleKey.E: // Emitir factura
+                    if (!specialKeys)
+                        break;
+                    return -101;
             }
         }
 
@@ -138,7 +143,8 @@ public static class Menu
         string[]? tips = null,
         int offset = 0,
         int currentPage = 0,
-        int totalPages = 0
+        int totalPages = 0,
+        int rowsPerPage = 10
     )
     {
         Console.Clear();
@@ -171,19 +177,19 @@ public static class Menu
             }
         }
 
+        // Verifica si hay paginacion
         if (currentPage > 0 && totalPages > 0)
         {
+            if (currentPage > 1 && choices.Length < rowsPerPage)
+            {
+                for (int i = 0; i < rowsPerPage - choices.Length; i++)
+                {
+                    Console.WriteLine();
+                }
+            }
+
             Console.WriteLine();
             Console.WriteLine($"\tPágina: {currentPage}/{totalPages}");
-        }
-
-        if (showHelp)
-        {
-            Console.WriteLine();
-            Console.WriteLine("\tPresiona [ENTER] para seleccionar una opción.");
-            Console.WriteLine("\tPresiona [W,A,S,D] para moverte.");
-            Console.WriteLine("\tPresiona [ESC] para salir.");
-            Console.WriteLine("\tPresiona [H] para mostrar/ocultar este menú.");
         }
 
         if (tips != null && tips.Length > 0)
@@ -193,6 +199,15 @@ public static class Menu
             {
                 Console.WriteLine($"\t{tips[i]}" + ((tips[i].Length > 0) ? "." : ""));
             }
+        }
+
+        if (showHelp)
+        {
+            Console.WriteLine();
+            Console.WriteLine("\tPresiona [ENTER] para seleccionar una opción.");
+            Console.WriteLine("\tPresiona [W,A,S,D] para moverte.");
+            Console.WriteLine("\tPresiona [ESC] para salir.");
+            Console.WriteLine("\tPresiona [H] para mostrar/ocultar este menú.");
         }
     }
 }

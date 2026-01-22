@@ -14,11 +14,22 @@ ProductController productController = new(
 
 InvoiceMenu invoiceMenu = new();
 CreateInvoiceMenu createInvoiceMenu = new();
-InvoiceDetailsMenu invoiceDetailsMenu = new();
+InvoiceItemsMenu invoiceItemsMenu = new();
+InvoiceDraftItemsMenu invoiceDraftItemsMenu = new();
+InvoiceDraftItemOptionsMenu invoiceDraftItemOptionsMenu = new();
 InvoiceRepository invoiceRepo = new();
-InvoiceDetailRepository invoiceDetailRepo = new();
-InvoiceService invoiceService = new(invoiceRepo, invoiceDetailRepo);
-InvoiceController invoiceController = new(invoiceMenu, createInvoiceMenu, invoiceDetailsMenu, invoiceRepo, invoiceService, productController, productService);
+InvoiceItemRepository invoiceItemRepo = new();
+InvoiceService invoiceService = new(invoiceRepo, invoiceItemRepo, productController, productService);
+InvoiceController invoiceController = new(
+    invoiceMenu, 
+    createInvoiceMenu,
+    invoiceItemsMenu,
+    invoiceDraftItemsMenu,
+    invoiceDraftItemOptionsMenu,
+    productController,
+    invoiceRepo, 
+    invoiceService
+);
 
 HomeMenu homeMenu = new();
 HomeController homeController = new(homeMenu, productController, invoiceController);

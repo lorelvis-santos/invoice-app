@@ -1,8 +1,8 @@
 namespace App.Model;
 
-public class InvoiceDetail : BaseModel
+public class InvoiceItem : BaseModel
 {
-    public static readonly string FullPath = Path.Combine(AppContext.BaseDirectory, "Database", "InvoiceDetail.txt");
+    public static readonly string FullPath = Path.Combine(AppContext.BaseDirectory, "Database", "InvoiceItem.txt");
     public static readonly string Headers = "id,invoiceId,productId,productName,quantity,unitPrice,rowTotal";
 
     public string InvoiceId { get; set; } = string.Empty;

@@ -4,20 +4,20 @@ using App.Model;
 
 namespace App.Repository;
 
-public class InvoiceDetailRepository : BaseRepository<InvoiceDetail>
+public class InvoiceItemRepository : BaseRepository<InvoiceItem>
 {
-    public InvoiceDetailRepository() : base(InvoiceDetail.FullPath, InvoiceDetail.Headers) { }
+    public InvoiceItemRepository() : base(InvoiceItem.FullPath, InvoiceItem.Headers) { }
 
-    protected override string MapToText(InvoiceDetail item)
+    protected override string MapToText(InvoiceItem item)
     {
         return $"{item.Id},{item.InvoiceId},{item.ProductId},{item.ProductName},{item.Quantity},{item.UnitPrice.ToString(CultureInfo.InvariantCulture)},{item.RowTotal.ToString(CultureInfo.InvariantCulture)}";
     }
 
-    protected override InvoiceDetail MapFromText(string line)
+    protected override InvoiceItem MapFromText(string line)
     {
         string[] parts = line.Split(',');
 
-        return new InvoiceDetail
+        return new InvoiceItem
         {
             Id = parts[0],
             InvoiceId = parts[1],
@@ -28,12 +28,12 @@ public class InvoiceDetailRepository : BaseRepository<InvoiceDetail>
         };
     }
 
-    public List<InvoiceDetail> GetDetailsByInvoiceId(string invoiceId)
+    public List<InvoiceItem> GetItemsByInvoiceId(string invoiceId)
     {
         EnsureHeaders();
 
-        List<InvoiceDetail> details = GetAll(reverse: true);
+        List<InvoiceItem> items = GetAll(reverse: true);
         
-        return details.FindAll(d => d.InvoiceId == invoiceId);
+        return items.FindAll(d => d.InvoiceId == invoiceId);
     }
 }

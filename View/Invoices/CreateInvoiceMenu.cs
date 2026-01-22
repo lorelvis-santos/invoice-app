@@ -11,6 +11,7 @@ public class CreateInvoiceMenu : IView
             [
                 "Ver detalle",
                 "Agregar/modificar productos",
+                "Modificar un producto",
                 "Eliminar un producto",
                 "Emitir factura"
             ],

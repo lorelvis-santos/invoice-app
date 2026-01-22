@@ -135,6 +135,8 @@ public class ProductController : BaseController
         }
 
         // A partir de aqui se implementarían funcionalidades como poder editar y eliminar...
+        Console.WriteLine("\n\tFuncionalidad no implementada.");
+        Console.ReadKey();
 
         return true;
     }
@@ -148,7 +150,7 @@ public class ProductController : BaseController
         Console.WriteLine("\tInsertar un nuevo producto"); 
 
         string name = PromptInput("Nombre");
-        string description = PromptInput("Description");
+        string description = PromptInput("Descripción");
         _ = decimal.TryParse(PromptInput("Precio"), out decimal price);
         _ = int.TryParse(PromptInput("Stock"), out int stock);
 
