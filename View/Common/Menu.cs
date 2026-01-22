@@ -180,7 +180,7 @@ public static class Menu
         // Verifica si hay paginacion
         if (currentPage > 0 && totalPages > 0)
         {
-            if (choices.Length < rowsPerPage)
+            if (currentPage > 1 && choices.Length < rowsPerPage)
             {
                 for (int i = 0; i < rowsPerPage - choices.Length; i++)
                 {
