@@ -13,11 +13,14 @@ public static class Database
         return FileUtils.ReadFile(path, false);
     }
 
-    public static List<string> Reverse(string path, string headers)
+    public static List<string> Reverse(string path, bool ignoreHeaders = true, string? headers = null)
     {
         List<string> lines = FileUtils.ReadFile(path, true);
         lines.Reverse();
-        lines.Insert(0, headers);
+        if (!ignoreHeaders && headers != null)
+        {
+            lines.Insert(0, headers);
+        }
         return lines;
     }
 
@@ -146,15 +149,17 @@ public static class Database
         return lines;
     }
 
-    public static List<string> UpdateRow(List<string> lines, int index, string newRow)
+    public static bool UpdateRow(string path, int index, string newRow)
     {
+        List<string> lines = Load(path);
+
         // Recordar que el índice 0 es para los headers
         if (index <= 0 || index >= lines.Count)
-            return lines;
+            return false;
 
         lines[index] = newRow;
 
-        return lines;
+        return Save(path, lines);
     }
 
     public static List<string> Pagination(List<string> lines, int page = 1, int rowsPerPage = 15, bool removeFirstLine = true)

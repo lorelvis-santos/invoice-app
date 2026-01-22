@@ -27,6 +27,52 @@ public class ProductRepository: BaseRepository<Product>
         };
     }
 
+    public bool UpdateStock(string id, int newStock)
+    {
+        Product? product = GetById(id);
+
+        if (product == null)
+        {
+            return false;
+        }
+
+        if (newStock < 0)
+        {
+            return false;
+        }
+
+        int rowIndex = Database.FindRowIndex(Path, "id", id);
+        product.Stock = newStock;
+
+        Database.UpdateRow(Path, rowIndex, MapToText(product));
+
+        return true;
+    }
+
+    public bool IncrementStock(string id, int toIncrement)
+    {
+        Product? product = GetById(id);
+
+        if (product == null)
+        {
+            return false;
+        }
+
+        return UpdateStock(id, product.Stock + toIncrement);
+    }
+
+    public bool DecrementStock(string id, int toDecrement)
+    {
+        Product? product = GetById(id);
+
+        if (product == null)
+        {
+            return false;
+        }
+
+        return UpdateStock(id, product.Stock - toDecrement);
+    }
+
     public bool Exists(string name)
     {
         var products = GetAll();

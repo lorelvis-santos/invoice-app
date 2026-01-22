@@ -29,8 +29,95 @@ public class ProductController : BaseController
         _view.Pages = data.ToPages(rowsPerPage);
         _view.RowsPerPage = rowsPerPage;
         _view.Tips = ["Pulsa [I] para agregar un nuevo producto"];
+        _view.Subtitle = "¡Estás administrando los productos!";
 
         return base.Execute();
+    }
+
+    public Product? Select(bool showPrice = true, bool showStock = true)
+    {
+        // Obtenemos los productos
+        List<Product> products = _repo.GetAll();
+        if (products.Count == 0)
+        {
+            return null;
+        }
+
+        // Mostramos los productos con paginacion
+        // Mostramos los productos con paginacion
+        List<string> data = [.. products.Select(p => {
+            string row = $"Nombre: {p.Name}";
+
+            if (showPrice) 
+            {
+                row += $" | Precio: {p.Price}";
+            }
+
+            if (showStock) {
+                row += $" | Stock: {p.Stock}";
+            }
+            
+            return row;
+        })];
+
+        int rowsPerPage = 10;
+        _view.Pages = data.ToPages(rowsPerPage);
+        _view.RowsPerPage = rowsPerPage;
+        _view.Tips = ["Presiona [ESC] para cancelar"];
+        _view.Subtitle = "Selecciona un producto";
+
+        // Mostramos la vista
+        int choice = _view.Show();
+
+        // Retornamos el objeto si la elección es válida
+        if (choice == -1)
+        {
+            return null; // El usuario canceló
+        }
+        
+        return products[choice];
+    }
+
+    public Product? Select(List<Product> products, bool showPrice = true, bool showStock = true)
+    {
+        // Obtenemos los productos
+        if (products.Count <= 0)
+        {
+            return null;
+        }
+
+        // Mostramos los productos con paginacion
+        List<string> data = [.. products.Select(p => {
+            string row = $"Nombre: {p.Name}";
+
+            if (showPrice) 
+            {
+                row += $" | Precio: {p.Price}";
+            }
+
+            if (showStock) {
+                row += $" | Stock: {p.Stock}";
+            }
+            
+            return row;
+        })];
+
+        int rowsPerPage = 10;
+        _view.Pages = data.ToPages(rowsPerPage);
+        _view.RowsPerPage = rowsPerPage;
+        _view.Tips = ["Presiona [ESC] para cancelar"];
+        _view.Subtitle = "Selecciona un producto";
+
+        // Mostramos la vista
+        int choice = _view.Show();
+
+        // Retornamos el objeto si la elección es válida
+        if (choice == -1)
+        {
+            return null; // El usuario canceló
+        }
+        
+        return products[choice];
     }
 
     protected override bool HandleChoice(int choice)
@@ -43,7 +130,7 @@ public class ProductController : BaseController
         // Caso especial: Insercion
         if (choice == -100)
         {
-            Insert();
+            CreateProduct();
             return true;
         }
 
@@ -52,7 +139,7 @@ public class ProductController : BaseController
         return true;
     }
 
-    private bool Insert()
+    private bool CreateProduct()
     {
         Console.Clear();
         Console.WriteLine();

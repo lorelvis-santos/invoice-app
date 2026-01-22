@@ -12,6 +12,66 @@ public class ProductService
         _repo = repo;
     }
 
+    public (bool Success, string Message) UpdateStock(string id, int newStock)
+    {
+        if (!Guid.TryParse(id, out _))
+        {
+            return (false, "Id inválida.");
+        }
+
+        if (newStock < 0)
+        {
+            return (false, "Stock inválido.");
+        }
+
+        if (!_repo.UpdateStock(id, newStock))
+        {
+            return (false, "No se pudo actualizar el nuevo stock.");
+        }
+
+        return (true, "Stock actualizado correctamente.");
+    }
+
+    public (bool Success, string Message) IncrementStock(string id, int toIncrement)
+    {
+        if (!Guid.TryParse(id, out _))
+        {
+            return (false, "Id inválida.");
+        }
+
+        if (toIncrement < 0)
+        {
+            return (false, "Stock inválido.");
+        }
+
+        if (!_repo.IncrementStock(id, toIncrement))
+        {
+            return (false, "No se pudo actualizar el nuevo stock.");
+        }
+
+        return (true, "Stock actualizado correctamente.");
+    }
+
+    public (bool Success, string Message) DecrementStock(string id, int toDecrement)
+    {
+        if (!Guid.TryParse(id, out _))
+        {
+            return (false, "Id inválida.");
+        }
+
+        if (toDecrement < 0)
+        {
+            return (false, "Stock inválido.");
+        }
+
+        if (!_repo.DecrementStock(id, toDecrement))
+        {
+            return (false, "No se pudo actualizar el nuevo stock.");
+        }
+
+        return (true, "Stock actualizado correctamente.");
+    }
+
     public (bool Success, string Message) CreateProduct(
         string name,
         string description,
@@ -40,7 +100,7 @@ public class ProductService
         {
             Name = name,
             Description = description,
-            Price = price,
+            Price = Math.Round(price, 2),
             Stock = stock
         };
 

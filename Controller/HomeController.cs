@@ -6,7 +6,14 @@ namespace App.Controller;
 
 public class HomeController : BaseController
 {
-    public HomeController(HomeMenu homeMenu) : base(homeMenu) { }
+    private readonly ProductController _productController;
+    private readonly InvoiceController _invoiceController;
+
+    public HomeController(HomeMenu homeMenu, ProductController productController, InvoiceController invoiceController) : base(homeMenu)
+    {
+        _productController = productController;
+        _invoiceController = invoiceController;
+    }
 
     protected override bool HandleChoice(int choice)
     {
@@ -31,26 +38,21 @@ public class HomeController : BaseController
                 break;
 
             case 0:
-                Console.WriteLine("Viendo facturas...");
-                Console.ReadKey();
+                bool invoicesLoop = true;
+
+                while (invoicesLoop)
+                {
+                    invoicesLoop = _invoiceController.Execute();
+                }
+
                 break;
                 
             case 1:
-                var productMenu = new ProductMenu();
-                var productRepo = new ProductRepository();
-                var productService = new ProductService(productRepo);
-
-                ProductController ProductController = new(
-                    productMenu, 
-                    productRepo,
-                    productService
-                );
-
                 bool productsLoop = true;
 
                 while (productsLoop)
                 {
-                    productsLoop = ProductController.Execute();
+                    productsLoop = _productController.Execute();
                 }
 
                 break;

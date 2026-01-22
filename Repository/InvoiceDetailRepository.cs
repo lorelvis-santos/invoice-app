@@ -1,11 +1,12 @@
 using System.Globalization;
+using App.Data;
 using App.Model;
 
 namespace App.Repository;
 
 public class InvoiceDetailRepository : BaseRepository<InvoiceDetail>
 {
-    public InvoiceDetailRepository() : base(Invoice.FullPath, Invoice.Headers) { }
+    public InvoiceDetailRepository() : base(InvoiceDetail.FullPath, InvoiceDetail.Headers) { }
 
     protected override string MapToText(InvoiceDetail item)
     {
@@ -25,5 +26,14 @@ public class InvoiceDetailRepository : BaseRepository<InvoiceDetail>
             Quantity = int.Parse(parts[4]),
             UnitPrice = decimal.Parse(parts[5], CultureInfo.InvariantCulture)
         };
+    }
+
+    public List<InvoiceDetail> GetDetailsByInvoiceId(string invoiceId)
+    {
+        EnsureHeaders();
+
+        List<InvoiceDetail> details = GetAll(reverse: true);
+        
+        return details.FindAll(d => d.InvoiceId == invoiceId);
     }
 }

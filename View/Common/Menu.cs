@@ -74,22 +74,39 @@ public static class Menu
 
                 case ConsoleKey.UpArrow:
                 case ConsoleKey.W:
-                    selectedIndex = selectedIndex > 0 ? --selectedIndex : pages[page - 1].Length - 1;
+                    if (pages.Length > 0 && pages[page - 1].Length > 0)
+                    {
+                        selectedIndex = selectedIndex > 0 ? --selectedIndex : pages[page - 1].Length - 1;
+                    }                    
                     break;
 
                 case ConsoleKey.D:
                 case ConsoleKey.RightArrow:
-                    page = pages.Length.NextPage(page);
+                    if (pages.Length > 0)
+                    {
+                        page = pages.Length.NextPage(page);
+                        offset = (page - 1) * rowsPerPage;
+                        selectedIndex = 0;
+                    }
                     return Show(title, pages, page, rowsPerPage, true, subtitle, tips);
 
                 case ConsoleKey.DownArrow:
                 case ConsoleKey.S:
-                    selectedIndex = selectedIndex >= pages[page - 1].Length - 1 ? 0 : ++selectedIndex;
+                    if (pages.Length > 0 && pages[page - 1].Length > 0)
+                    {
+                        selectedIndex = selectedIndex >= pages[page - 1].Length - 1 ? 0 : ++selectedIndex;
+                    }
                     break;
 
                 case ConsoleKey.LeftArrow:
                 case ConsoleKey.A:
-                    page = pages.Length.PreviousPage(page);
+                    if (pages.Length > 0)
+                    {
+                        page = pages.Length.PreviousPage(page);
+                        offset = (page - 1) * rowsPerPage;
+                        selectedIndex = 0; 
+                    }
+
                     return Show(title, pages, page, rowsPerPage, true, subtitle, tips);
 
                 case ConsoleKey.Enter:

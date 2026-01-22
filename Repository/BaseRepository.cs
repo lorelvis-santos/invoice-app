@@ -29,11 +29,11 @@ public abstract class BaseRepository<T>
     }
 
     // Obtiene todos los objetos del archivo, ignorando los headers.
-    public List<T> GetAll()
+    public List<T> GetAll(bool reverse = false)
     {
         EnsureHeaders();
 
-        List<string> lines = FileUtils.ReadFile(Path, true);
+        List<string> lines = reverse ? Database.Reverse(Path) : FileUtils.ReadFile(Path, true);
         List<T> items = [];
 
         foreach (string line in lines)
@@ -57,6 +57,23 @@ public abstract class BaseRepository<T>
         }
 
         return Database.Save(Path, lines);
+    }
+
+    public T? GetById(string id)
+    {
+        if (!Guid.TryParse(id, out _))
+        {
+            return default(T);
+        }
+
+        var result = Database.Where(Path, "id", id);
+
+        if (result.Count == 0)
+        {
+            return default(T);
+        }
+
+        return MapFromText(result[0]);
     }
 
     protected abstract string MapToText(T item);
