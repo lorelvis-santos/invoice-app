@@ -1,0 +1,14 @@
+id,name,description,price,stock
+94b08bd0-49af-4cb0-9586-f7769e8f57ee,Guineo,Maduro criollo,5.00,80
+4c72f378-180b-4d99-9625-46c1b72f16ce,Lechosa,Grande y dulce,85.00,0
+7171437b-7c0a-4c70-8d24-398152d6c7e5,Piña,Gota de miel,75.00,0
+33da1c07-585c-4bd4-a666-9b93236d16e4,Aguacate,Hass de exportación,60.00,25
+acf7b13d-ca7e-4710-a78e-413495af2077,Naranja,Para jugo (docena),120.00,50
+b21f262e-f4fe-415f-9ea5-727492fcbda3,Mango,Banilejo,25.00,200
+c8dda9b6-6ece-4859-82a7-7bb97f3ae065,Sandía,Unidad mediana,150.00,30
+e41bc285-712d-4a46-a191-b597ec7cd1b6,Uva,Roja sin semilla (libra),145.00,30
+12f5fd57-0120-4f7f-90e0-53387d090bf1,Limón,Persa (unidad),7.00,300
+6e2d253b-d045-468e-9396-7d497bca5185,Fresa,Fresca de Jarabacoa (paquete),110.00,40
+fb50603f-cdb1-4f6c-8b89-4f7224e38ea3,Pera,De Cuba,60,250
+96198bc3-245b-4a9f-8e08-6d02ee74cf55,Manzana,Roja,50,100
+54f11a72-e2f0-4d22-825f-15776db7a5a2,Kiwi,Oriental,70,70
